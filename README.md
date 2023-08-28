@@ -21,6 +21,10 @@
 - Freeze Pose (Delete Animator)
 - Punish (Delete Character)
 
+### Games
+
+- [Car Crash Test](https://www.roblox.com/games/7720943627)
+
 ### Script
 
 ``loadstring(game:HttpGet('https://raw.githubusercontent.com/wallop560/BOBO_GUI/main/main.lua'))()``
