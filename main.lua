@@ -23,6 +23,7 @@ local GUI = Create(
 	},{
 		Create(
 			"Frame",{
+				AnchorPoint = Vector2.new(.5,.5),
 				BorderColor3 = Color3.new(0, 0, 0),
 				Position = UDim2.new(.5,0,.5,0),
 				Name = "Body",
@@ -147,7 +148,6 @@ local GUI = Create(
 		)
 	}
 )
-
 local function CreateButton(Name,Callback)
 	local ButtonTemplate = Create(
 		"TextButton",{
@@ -211,6 +211,37 @@ local OldNC OldNC = hookfunction(getrawmetatable(game).__namecall,function(self,
 end)
 
 local Players = game:GetService('Players')
+
+local UIS = game:GetService('UserInputService')
+local TS = game:GetService('TweenService')
+local function Dragify(Body,Handle)
+	Handle = Handle or Body
+	
+	local Changed 
+	
+	Handle.InputBegan:Connect(function(Input)
+		if Input.UserInputType == Enum.UserInputType.MouseButton1 then
+			local CurrentCamera = workspace.CurrentCamera
+			local Position = UDim2.fromScale((Body.AbsolutePosition.X+Body.Size.X.Offset/2)/CurrentCamera.ViewportSize.X,(Body.AbsolutePosition.Y+Body.Size.Y.Offset/2)/(CurrentCamera.ViewportSize.Y-36))
+			local MousePos = UDim2.fromScale(Input.Position.X/CurrentCamera.ViewportSize.X,(Input.Position.Y)/(CurrentCamera.ViewportSize.Y-36))
+			
+			local Grip = MousePos-Position
+			Changed = UIS.InputChanged:Connect(function(Input)
+				if Input.UserInputType == Enum.UserInputType.MouseMovement then
+					MousePos = UDim2.fromScale(Input.Position.X/CurrentCamera.ViewportSize.X,Input.Position.Y/(CurrentCamera.ViewportSize.Y-36))
+					
+					TS:Create(Body,TweenInfo.new(.1,Enum.EasingStyle.Linear,Enum.EasingDirection.In),{Position = MousePos-Grip}):Play()
+				end
+			end)
+		end
+	end)
+	Handle.InputEnded:Connect(function(Input)
+		if Input.UserInputType == Enum.UserInputType.MouseButton1 then
+			Changed:Disconnect()
+		end
+	end)
+end
+Dragify(GUI.Body,GUI.Body.Title,.1)
 local SelectedPlayers = {game.Players.LocalPlayer}
 GUI.Body.Content.PlayerBoxFrame.PlayerBox.FocusLost:Connect(function()
 	local Text = GUI.Body.Content.PlayerBoxFrame.PlayerBox.Text:lower()
@@ -308,10 +339,12 @@ CreateButton('StealTool',function()
 			local Tool = Player.Character:FindFirstChildOfClass('Tool')
 			local Handle = Tool and Tool:FindFirstChild('Handle')
 			local Humanoid = FindDecendant('Humanoid',Player.Character)
+			local LocalHumanoid = (Players.LocalPlayer.Character or Players.LocalPlayer.CharacterAdded:Wait()):WaitForChild('Humanoid',3)
 			if Handle then
 				Humanoid:Destroy(true)
-				wait(1)
-				repeat firetouchinterest(Handle,Players.LocalPlayer.Character.PrimaryPart,1) wait() firetouchinterest(Handle,Players.LocalPlayer.Character.PrimaryPart,0) wait() until Tool.Parent == Players.LocalPlayer.Character
+				repeat wait() until Humanoid.Parent == nil
+				LocalHumanoid:EquipTool(Tool)
+				--repeat firetouchinterest(Handle,Players.LocalPlayer.Character.PrimaryPart,1) wait() firetouchinterest(Handle,Players.LocalPlayer.Character.PrimaryPart,0) wait() until Tool.Parent == Players.LocalPlayer.Character
 			end
 		end
 	end
@@ -399,10 +432,85 @@ CreateButton('Naked',function()
 	for _,Player in pairs(SelectedPlayers) do
 		if Player.Character then
 			for _,Clothing in pairs(Player.Character:GetChildren()) do
-				if Clothing:IsA('Clothing') then
+				if Clothing:IsA('Clothing') or Clothing:IsA('ShirtGraphic') then
 					Clothing:Destroy(true)
 				end
 			end
+		end
+	end
+end)
+CreateButton('NoFace',function()
+	for _,Player in pairs(SelectedPlayers) do
+		if Player.Character and Player.Character:FindFirstChild('Head') then
+			Player.Character.Head:FindFirstChildOfClass('Decal'):Destroy(true)
+		end
+	end
+end)
+CreateButton('BrickHead (R6)',function()
+	for _,Player in pairs(SelectedPlayers) do
+		if Player.Character and Player.Character:FindFirstChild('Head') then
+			Player.Character.Head:FindFirstChildOfClass('SpecialMesh'):Destroy(true)
+		end
+	end
+end)
+CreateButton('No Hats',function()
+	for _,Player in pairs(SelectedPlayers) do
+		if Player.Character then
+			for _,Hat in pairs(Player.Character:GetChildren()) do
+				if Hat:IsA('Accessory') then
+					Hat:Destroy(true)
+				end
+			end
+		end
+	end
+end)
+CreateButton('Creeper',function()
+	for _,Player in pairs(SelectedPlayers) do
+		if Player.Character then
+			if Player.Character:FindFirstChild('LowerTorso') then
+				Player.Character.LeftUpperArm:Destroy(true)
+				Player.Character.RightUpperArm:Destroy(true)
+				
+				Player.Character.LeftLowerArm:Destroy(true)
+				Player.Character.LeftHand:Destroy(true)
+				Player.Character.RightLowerArm:Destroy(true)
+				Player.Character.RightHand:Destroy(true)
+			else
+				Player.Character['Left Arm']:Destroy(true)
+				Player.Character['Right Arm']:Destroy(true)
+			end
+		end
+	end
+end)
+CreateButton('NoLimbs',function()
+	for _,Player in pairs(SelectedPlayers) do
+		if Player.Character then
+			if Player.Character:FindFirstChild('LowerTorso') then
+				Player.Character.LeftUpperArm:Destroy(true)
+				Player.Character.RightUpperArm:Destroy(true)
+				
+				Player.Character.LeftUpperLeg:Destroy(true)
+				Player.Character.RightUpperLeg:Destroy(true)
+			else
+				Player.Character['Left Arm']:Destroy(true)
+				Player.Character['Right Arm']:Destroy(true)
+				Player.Character['Left Leg']:Destroy(true)
+				Player.Character['Right Leg']:Destroy(true)
+			end
+		end
+	end
+end)
+CreateButton('Freeze Pose',function()
+	for _,Player in pairs(SelectedPlayers) do
+		if Player.Character then
+			Player.Character.Humanoid:FindFirstChildOfClass("Animator"):Destroy(true)
+		end
+	end
+end)
+CreateButton('Punish',function()
+	for _,Player in pairs(SelectedPlayers) do
+		if Player.Character then
+			Player.Character:Destroy(true)
 		end
 	end
 end)
