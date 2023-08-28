@@ -372,6 +372,12 @@ CreateButton('Btools',function()
 	    Target:Destroy(true)
 	end)
 end)
+local HasDex = false
+CreateButton('Dex/Explorer',function()
+	if HasDex then return end
+	HasDex = true
+	loadstring(game:HttpGet('https://raw.githubusercontent.com/wallop560/BOBO_GUI/main/dex.lua'))()
+end)
 CreateButton('BreakJoints',function()
 	for _,Player in pairs(SelectedPlayers) do
 		if not Player.Character then continue end
