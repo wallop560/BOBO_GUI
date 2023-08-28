@@ -1000,10 +1000,11 @@ local function main()
 		end})
 
 		context:Register("DELETE",{Name = "Delete", IconMap = Explorer.MiscIcons, Icon = "Delete", DisabledIcon = "Delete_Disabled", Shortcut = "Del", OnClick = function()
-			local destroy = game.Destroy
 			local sList = selection.List
 			for i = 1,#sList do
-				pcall(destroy,sList[i].Obj,true)
+				pcall(function()
+					sList[i].Obj:Destroy(true)
+				end)
 			end
 			selection:Clear()
 		end})
