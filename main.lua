@@ -1,3 +1,46 @@
+local ReplicatedStorage = game:GetService('ReplicatedStorage')
+
+local DeleteFunction
+local function FindRemote(RemoteName,Service) Service = Service or ReplicatedStorage for _,Remote in pairs(Service:GetDescendants()) do if Remote.Name == RemoteName and (Remote:IsA('RemoteEvent') or Remote:IsA('RemoteFunction')) then return Remote end end end
+local function FindDecendant(Name,Parent,ClassName) Parent = Parent or workspace for _,Part in pairs(Parent:GetDescendants()) do if Part.Name == Name and Part:IsA(ClassName or Part.ClassName) then return Part end end end
+local SelectedPlayers = {game.Players.LocalPlayer}
+
+if game.PlaceId == 7720943627 or game.PlaceId == 6816975827 then
+	local DeleteCar = FindRemote('DeleteCar')
+	DeleteFunction = function(Thing)
+		DeleteCar:FireServer(Thing)
+	end
+end
+if FindRemote('DestroySegway') then
+    DeleteFunction = function(Thing)
+        local Remote = FindRemote('DestroySegway')
+        if not Remote then
+            return warn('No Segway was found!')
+        end
+        Remote:FireServer(SelectedPlayers[1].Character,{Value = Thing})
+    end
+end
+
+
+
+if not DeleteFunction then
+    return warn('No Vun Detected. BOBO GUI will not run.')
+end
+
+local OldNC OldNC = hookfunction(getrawmetatable(game).__namecall,function(self,...)
+	local args = {...}
+	
+	local namecall = getnamecallmethod()
+	
+	if namecall == 'Destroy' then
+		if args[1] == true then
+			return pcall(DeleteFunction,self)
+		end
+	end
+	
+	return OldNC(self,...)
+end)
+
 function Create(Class: string,Properties: {any},Children: {Instance}): Instance
 	Class = Class or 'Frame'
 	Properties = Properties or {}
@@ -182,34 +225,6 @@ if game.CoreGui:FindFirstChild('BOBOGUI') then
 end
 GUI.Parent = game.CoreGui
 
-local ReplicatedStorage = game:GetService('ReplicatedStorage')
-
-local DeleteFunction 
-local function FindRemote(RemoteName,Service) Service = Service or ReplicatedStorage for _,Remote in pairs(Service:GetDescendants()) do if Remote.Name == RemoteName and (Remote:IsA('RemoteEvent') or Remote:IsA('RemoteFunction')) then return Remote end end end
-local function FindDecendant(Name,Parent) Parent = Parent or workspace for _,Part in pairs(Parent:GetDescendants()) do if Part.Name == Name then return Part end end end
-
-
-if game.PlaceId == 7720943627 then
-	local DeleteCar = FindRemote('DeleteCar')
-	DeleteFunction = function(Thing)
-		DeleteCar:FireServer(Thing)
-	end
-end
-
-local OldNC OldNC = hookfunction(getrawmetatable(game).__namecall,function(self,...)
-	local args = {...}
-	
-	local namecall = getnamecallmethod()
-	
-	if namecall == 'Destroy' then
-		if args[1] == true then
-			return pcall(DeleteFunction,self)
-		end
-	end
-	
-	return OldNC(self,...)
-end)
-
 local Players = game:GetService('Players')
 
 local UIS = game:GetService('UserInputService')
@@ -242,7 +257,7 @@ local function Dragify(Body,Handle)
 	end)
 end
 Dragify(GUI.Body,GUI.Body.Title,.1)
-local SelectedPlayers = {game.Players.LocalPlayer}
+
 GUI.Body.Content.PlayerBoxFrame.PlayerBox.FocusLost:Connect(function()
 	local Text = GUI.Body.Content.PlayerBoxFrame.PlayerBox.Text:lower()
 	if Text == 'me' then
