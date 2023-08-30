@@ -17,7 +17,7 @@ local function FindRemote(RemoteName,Service) Service = Service or ReplicatedSto
 local function FindDecendant(Name,Parent,ClassName) Parent = Parent or workspace for _,Part in pairs(Parent:GetDescendants()) do if Part.Name == Name and Part:IsA(ClassName or Part.ClassName) then return Part end end end
 local SelectedPlayers = {game.Players.LocalPlayer}
 
-if game.PlaceId == 7720943627 or game.PlaceId == 6816975827 then
+if game.PlaceId == 7720943627 or game.PlaceId == 6816975827 or game.PlaceId == 6865382813 then
 	local DeleteCar = FindRemote('DeleteCar')
 	DeleteFunction = function(Thing)
 		DeleteCar:FireServer(Thing)
