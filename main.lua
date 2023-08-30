@@ -1,3 +1,15 @@
+local OldNC OldNC = hookfunction(getrawmetatable(game).__namecall,function(self,...)
+	local args = {...}
+	
+	local namecall = getnamecallmethod()
+
+    if namecall == 'Kick' then
+        return warn('Kick Attempted lol')
+    end
+
+    return OldNC(self,...)
+end)
+
 local ReplicatedStorage = game:GetService('ReplicatedStorage')
 
 local DeleteFunction
@@ -36,6 +48,8 @@ local OldNC OldNC = hookfunction(getrawmetatable(game).__namecall,function(self,
 		if args[1] == true then
 			return pcall(DeleteFunction,self)
 		end
+    elseif namecall == 'Kick' then
+        return warn('Kick Attempted by'..d)
 	end
 	
 	return OldNC(self,...)
