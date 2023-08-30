@@ -13,7 +13,7 @@ end)
 local ReplicatedStorage = game:GetService('ReplicatedStorage')
 
 local DeleteFunction
-local function FindRemote(RemoteName,Service) Service = Service or ReplicatedStorage for _,Remote in pairs(Service:GetDescendants()) do if Remote.Name == RemoteName and (Remote:IsA('RemoteEvent') or Remote:IsA('RemoteFunction')) then return Remote end end end
+local function FindRemote(RemoteName,Service) Service = Service or game for _,Remote in pairs(Service:GetDescendants()) do if Remote.Name == RemoteName and (Remote:IsA('RemoteEvent') or Remote:IsA('RemoteFunction')) then return Remote end end end
 local function FindDecendant(Name,Parent,ClassName) Parent = Parent or workspace for _,Part in pairs(Parent:GetDescendants()) do if Part.Name == Name and Part:IsA(ClassName or Part.ClassName) then return Part end end end
 local SelectedPlayers = {game.Players.LocalPlayer}
 
